@@ -1,16 +1,27 @@
 module Roadshow
   class Command(Options)
-    def run(args : Array(String)) : Void
+    # NOTE: This should be `Command | Nil`, but it's not because of limitations
+    # of Crystal.
+    def self.get_command(name) : Command
+      case name
+      when "help"
+        Commands::Help.new
+      else
+        raise UnknownCommand.new
+      end
+    end
+
+    def run(stdin : IO, stdout : IO, args : Array(String)) : Void
       options = Options.new
-      parser = parser(options)
+      parser = parser(stdout, options)
       parser.parse(args)
-      run(options)
+      run(stdin, stdout, options)
     rescue e : OptionParser::InvalidOption | OptionParser::MissingOption
-      puts e.message.colorize(:red)
-      puts parser
+      stdout.puts e.message.colorize(:red)
+      stdout.puts parser(stdout)
       raise CommandFailed.new
     rescue InvalidArgument
-      puts parser
+      stdout.puts parser(stdout)
       raise CommandFailed.new
     end
 
@@ -18,11 +29,11 @@ module Roadshow
       parser(nil).to_s
     end
 
-    def parser(options : Options = Options.new) : OptionParser
+    def parser(stdout : IO, options : Options = Options.new) : OptionParser
       raise "Not implemented"
     end
 
-    def run(options : Options) : Void
+    def run(stdin : IO, stdout : IO, options : Options) : Void
       raise "Not implemented"
     end
   end

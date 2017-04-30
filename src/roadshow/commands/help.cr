@@ -6,7 +6,7 @@ module Roadshow
     end
 
     class Help < Command(HelpOptions)
-      def parser(options = HelpOptions.new)
+      def parser(stdout : IO, options = HelpOptions.new)
         OptionParser.new do |parser|
           parser.banner = <<-BANNER
           Usage: roadshow help [COMMAND]
@@ -21,25 +21,25 @@ module Roadshow
             options.command = non_options.shift?
 
             if non_options.size > 0
-              puts "Unexpected arguments: #{non_options.join(", ")}".colorize(:red)
+              stdout.puts "Unexpected arguments: #{non_options.join(", ")}".colorize(:red)
               raise InvalidArgument.new
             end
           end
         end
       end
 
-      def run(options : HelpOptions)
+      def run(stdin : IO, stdout : IO, options : HelpOptions)
         if options.command
           begin
-            command = Roadshow.get_command(options.command)
-            puts command.parser
+            command = Roadshow::Command.get_command(options.command)
+            stdout.puts command.parser(stdout)
           rescue UnknownCommand
-            puts "Command not found: #{options.command}".colorize(:red)
-            puts
+            stdout.puts "Command not found: #{options.command}".colorize(:red)
+            stdout.puts
             raise CommandFailed.new
           end
         else
-          puts parser
+          stdout.puts parser(stdout)
         end
       end
     end

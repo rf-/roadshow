@@ -14,13 +14,12 @@ module Roadshow
           Get help about a specific subcommand.
           BANNER
 
-          parser.separator
-
           parser.unknown_args do |args|
             non_options = args.reject { |a| a.starts_with?("-") }
             options.command = non_options.shift?
 
             if non_options.size > 0
+              stdout.puts
               stdout.puts "Unexpected arguments: #{non_options.join(", ")}".colorize(:red)
               raise InvalidArgument.new
             end

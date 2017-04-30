@@ -6,6 +6,8 @@ module Roadshow
       case name
       when "help"
         Commands::Help.new
+      when "init"
+        Commands::Init.new
       else
         raise UnknownCommand.new
       end

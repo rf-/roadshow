@@ -1,6 +1,6 @@
 require "colorize"
-require "json"
 require "option_parser"
+require "yaml"
 
 require "./*"
 require "./commands/*"
@@ -35,6 +35,7 @@ module Roadshow
 
       Commands:
          help        Get help about a command
+         init        Generate a `scenarios.yml` file
       HELP
     end
   end

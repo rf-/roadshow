@@ -1,0 +1,13 @@
+---
+version: "2"
+services:
+  scenario:
+    build:
+      context: ..
+      dockerfile: scenarios/two.dockerfile
+    image: simple_scenario_two
+    volumes:
+    - "..:/scenario"
+    environment:
+      ENV_VAR: scenario two
+volumes: {}

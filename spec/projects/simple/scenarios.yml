@@ -1,0 +1,17 @@
+project: simple
+
+shared:
+  from: bash
+  cmd: "echo 'default command' && echo $ENV_VAR"
+
+scenarios:
+  one:
+    service:
+      environment:
+        ENV_VAR: scenario one
+  two:
+    from: bash
+    cmd: "echo 'overridden command' && echo $ENV_VAR"
+    service:
+      environment:
+        ENV_VAR: scenario two

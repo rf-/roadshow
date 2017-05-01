@@ -1,0 +1,17 @@
+project: ruby
+
+shared:
+  from: ruby:2.4
+  cmd: "bundle install && bundle exec rake"
+  service:
+    volumes:
+      - bundle:/usr/local/bundle
+    environment:
+      BUNDLE_GEMFILE: scenarios/{{scenario_name}}.gemfile
+  volumes:
+    bundle:
+
+scenarios:
+  one:
+    from: ruby:2.2
+  two: {}

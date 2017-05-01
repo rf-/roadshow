@@ -8,6 +8,8 @@ module Roadshow
         Commands::Help.new
       when "init"
         Commands::Init.new
+      when "generate"
+        Commands::Generate.new
       else
         raise UnknownCommand.new
       end

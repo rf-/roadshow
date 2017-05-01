@@ -1,4 +1,5 @@
 require "colorize"
+require "file_utils"
 require "option_parser"
 require "yaml"
 

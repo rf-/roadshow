@@ -1,0 +1,15 @@
+---
+version: "2"
+services:
+  scenario:
+    build:
+      context: ..
+      dockerfile: scenarios/one.dockerfile
+    image: ruby_scenario_one
+    volumes:
+    - "..:/scenario"
+    - "bundle:/usr/local/bundle"
+    environment:
+      BUNDLE_GEMFILE: scenarios/one.gemfile
+volumes:
+  bundle: {}

@@ -20,7 +20,7 @@ describe Roadshow::Commands::Init do
       status, output = SpecHelper.run(["init"])
 
       status.should eq(2)
-      output.should eq("Error: scenarios.yml already exists.".colorize(:red).to_s)
+      output.should contain("Error: scenarios.yml already exists")
       File.exists?("scenarios.yml").should eq(true)
     end
   end

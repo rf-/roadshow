@@ -7,4 +7,7 @@ module Roadshow
 
   class CommandFailed < Exception
   end
+
+  class InvalidConfig < Exception
+  end
 end

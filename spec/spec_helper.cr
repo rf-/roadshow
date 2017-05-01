@@ -1,4 +1,3 @@
-require "file_utils"
 require "spec"
 require "../src/roadshow/*"
 

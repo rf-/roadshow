@@ -26,6 +26,8 @@ describe Roadshow::Commands::Generate do
       begin
         FileUtils.mv("scenarios", "expected_scenarios")
         FileUtils.mkdir("scenarios")
+        FileUtils.cp("expected_scenarios/one.gemfile", "scenarios")
+        FileUtils.cp("expected_scenarios/two.gemfile", "scenarios")
 
         output = SpecHelper.run!(["generate"])
         output.should eq("Generated files in scenarios/.")

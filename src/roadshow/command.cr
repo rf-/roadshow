@@ -10,6 +10,8 @@ module Roadshow
         Commands::Init.new
       when "generate"
         Commands::Generate.new
+      when "run"
+        Commands::Run.new
       else
         raise UnknownCommand.new
       end

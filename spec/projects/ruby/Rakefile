@@ -1,0 +1,15 @@
+task :default do
+  begin
+    require "cuba"
+    puts "Loaded Cuba!"
+  rescue LoadError => e
+    puts "Failed to load Cuba!"
+  end
+
+  begin
+    require "sinatra"
+    puts "Loaded Sinatra!"
+  rescue LoadError => e
+    puts "Failed to load Sinatra!"
+  end
+end

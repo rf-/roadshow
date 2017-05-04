@@ -1,12 +1,10 @@
 # Roadshow
 
-Take your code on the road.
-
 ## Summary
 
 Roadshow is a tool that uses [Docker] and [Docker Compose] to make it easy to
-test your application or library against different sets of dependencies without
-relying on an external CI tool.
+test your library or application against different sets of dependencies without
+relying on an external CI service.
 
 ## Setup
 
@@ -14,10 +12,8 @@ relying on an external CI tool.
 your `PATH` to use Roadshow. On a Mac, you can install them using
 [Homebrew-Cask].)
 
-Roadshow's configuration is specified in a YAML file which, by default, lives
-at the top level of your project and is named `scenarios.yml`. (You can always
-override that default by passing the `-f` or `--scenario-file` option to any
-command.)
+Roadshow's configuration is specified in a YAML file which lives at the top
+level of your project and is named `scenarios.yml`.
 
 To generate a skeleton for this file, use the `init` command:
 
@@ -25,15 +21,15 @@ To generate a skeleton for this file, use the `init` command:
 
 Here's an example of a basic `scenarios.yml` file:
 
-    # Based on the name of your working directory. This will be prepended
-    # to the generated Docker image names created by Docker Compose.
+    # Based on the name of your working directory by default. This will be
+    # prepended to the generated Docker image names created by Docker Compose.
     project: someprojectname
 
     # This configuration is shared by all of your scenarios, except where they
     # override it. The format is identical to an individual scenario.
     #
     # Anywhere in this block, you can use the placeholder "{{scenario_name}}"
-    # to stand in for the name of an individual scenario.
+    # to stand in for the name of each individual scenario.
     shared:
       # Specify the value to pass into FROM in the Dockerfile (i.e.,
       # what image to use as a starting point for this scenario).
@@ -45,9 +41,8 @@ Here's an example of a basic `scenarios.yml` file:
     # The individual scenarios.
     scenarios:
       one:
-        # Configuration for the main service in Docker Compose. If you need any
-        # ancillary services, you can use a `services` key and configure them
-        # using the normal Docker Compose syntax.
+        # Configuration for the main service in Docker Compose. Extra services
+        # aren't supported yet.
         service:
           environment:
             ENV_VAR: scenario one
@@ -76,10 +71,10 @@ option:
     roadshow run -s rails32
 
 To run a non-default command across all scenarios or an individual scenario,
-use the `-c` or `--command` option:
+pass extra arguments, optionally preceded by `--` to avoid any ambiguity:
 
-    roadshow run -c "rails console"
-    roadshow run -s rails32 -c "rails console"
+    roadshow run rails console
+    roadshow run -s rails32 -- rails console
 
 In all of these cases, if any of the individual commands exit with a non-zero
 status then Roadshow will too.

@@ -1,5 +1,7 @@
 # Roadshow
 
+[![](https://secure.travis-ci.org/rf-/roadshow.svg?branch=master)](http://travis-ci.org/rf-/roadshow)
+
 ## Summary
 
 Roadshow is a tool that uses [Docker] and [Docker Compose] to make it easy to

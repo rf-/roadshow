@@ -1,1 +1,4 @@
 language: crystal
+sudo: required
+services:
+  - docker

@@ -33,6 +33,9 @@ module Roadshow
       Commands:
          help        Get help about a command
          init        Generate a `scenarios.yml` file
+         generate    Generate Docker configuration
+         run         Run scenarios with Docker
+         cleanup     Clean up Docker images
       HELP
     end
   end

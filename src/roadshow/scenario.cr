@@ -102,7 +102,7 @@ module Roadshow
               "context"    => "..",
               "dockerfile" => "scenarios/#{dockerfile_name}",
             },
-            "image"       => "#{@project_name}_scenario_#{@name}",
+            "image"       => image_name,
             "volumes"     => service_volumes,
             "environment" => service_environment,
           },
@@ -113,6 +113,10 @@ module Roadshow
 
     def docker_compose_name : String
       "#{@name}.docker-compose.yml"
+    end
+
+    def image_name : String
+      "#{@project_name}_scenario_#{@name}"
     end
 
     private def gsub_name(value : String?) : String?

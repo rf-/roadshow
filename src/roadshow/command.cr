@@ -12,6 +12,8 @@ module Roadshow
         Commands::Generate.new
       when "run"
         Commands::Run.new
+      when "cleanup"
+        Commands::Cleanup.new
       else
         raise UnknownCommand.new
       end

@@ -12,11 +12,7 @@ module Roadshow
       command = args.shift?
 
       if command
-        # Use real STDIN here since other IOs won't implement `cooked` (and
-        # it's harmless).
-        STDIN.cooked do
-          Command.get_command(command).run(stdin, stdout, args)
-        end
+        Command.get_command(command).run(stdin, stdout, args)
       else
         print_usage(stdout)
       end

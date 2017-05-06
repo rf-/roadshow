@@ -16,7 +16,7 @@ module Roadshow
 
       def run(stdin : IO, stdout : IO, options : InitOptions)
         if File.exists?(SCENARIOS_FILENAME)
-          stdout.puts "Error: #{SCENARIOS_FILENAME} already exists".colorize(:red)
+          stdout.puts "Error: file '#{SCENARIOS_FILENAME}' already exists".colorize(:red)
           raise CommandFailed.new
         end
 
@@ -44,7 +44,7 @@ module Roadshow
 
         File.write(SCENARIOS_FILENAME, content)
 
-        stdout.puts "Generated #{SCENARIOS_FILENAME}."
+        stdout.puts "Generated file './#{SCENARIOS_FILENAME}'."
       end
     end
   end

@@ -101,7 +101,7 @@ module Roadshow
           "scenario" => {
             "build" => {
               "context"    => "..",
-              "dockerfile" => "scenarios/#{dockerfile_name}",
+              "dockerfile" => "#{OUTPUT_DIRECTORY}/#{dockerfile_name}",
             },
             "image"       => image_name,
             "volumes"     => service_volumes,

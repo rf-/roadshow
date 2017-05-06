@@ -14,8 +14,8 @@ module Roadshow
           parser.banner = <<-BANNER
           Usage: roadshow run [command]
 
-          Run scenarios from your `scenarios` directory. With no options, run
-          the default command for each scenario.
+          Run scenarios from your `#{OUTPUT_DIRECTORY}` directory. With no
+          options, run the default command for each scenario.
           BANNER
 
           parser.separator
@@ -41,15 +41,15 @@ module Roadshow
           raise CommandFailed.new
         end
 
-        unless File.directory?("scenarios")
-          stdout.puts "Error: no directory './scenarios' found".colorize(:red)
+        unless File.directory?(OUTPUT_DIRECTORY)
+          stdout.puts "Error: no directory './#{OUTPUT_DIRECTORY}' found".colorize(:red)
           stdout.puts "\nUse 'roadshow generate' to create scenario files."
           raise CommandFailed.new
         end
 
         config = ProjectConfig.load(YAML.parse(File.read(SCENARIOS_FILENAME)))
 
-        compose_files = Dir["scenarios/*.docker-compose.yml"].map do |path|
+        compose_files = Dir["#{OUTPUT_DIRECTORY}/*.docker-compose.yml"].map do |path|
           {path, File.basename(path, ".docker-compose.yml")}
         end
 
@@ -78,7 +78,7 @@ module Roadshow
               input: stdin,
               output: stdout,
               error: stdout,
-              env: { "COMPOSE_PROJECT_NAME" => config.project }
+              env: {"COMPOSE_PROJECT_NAME" => config.project}
             ).success?
           else
             stdout.puts "\nSkipping scenario: #{name}\n".colorize.bold

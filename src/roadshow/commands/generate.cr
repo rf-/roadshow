@@ -43,7 +43,7 @@ module Roadshow
           )
         end
 
-        stdout.puts "Generated files in #{OUTPUT_DIRECTORY}/."
+        stdout.puts "Generated files in directory './#{OUTPUT_DIRECTORY}'."
       rescue e : InvalidConfig
         stdout.puts "Error: #{e.message}".colorize(:red)
       end

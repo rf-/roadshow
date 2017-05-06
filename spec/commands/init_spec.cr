@@ -5,7 +5,7 @@ describe Roadshow::Commands::Init do
     SpecHelper.in_project("empty") do
       output = SpecHelper.run!(["init"])
 
-      output.should eq("Generated scenarios.yml.")
+      output.should eq("Generated file './scenarios.yml'.")
       File.exists?("scenarios.yml").should eq(true)
 
       contents = YAML.parse(File.read("scenarios.yml"))
@@ -20,7 +20,7 @@ describe Roadshow::Commands::Init do
       status, output = SpecHelper.run(["init"])
 
       status.should eq(2)
-      output.should contain("Error: scenarios.yml already exists")
+      output.should contain("Error: file 'scenarios.yml' already exists")
       File.exists?("scenarios.yml").should eq(true)
     end
   end

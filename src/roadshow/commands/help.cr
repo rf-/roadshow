@@ -20,7 +20,7 @@ module Roadshow
 
             if non_options.size > 0
               stdout.puts
-              stdout.puts "Unexpected arguments: #{non_options.join(", ")}".colorize(:red)
+              stdout.puts "Error: Unexpected arguments: #{non_options.join(", ")}".colorize(:red)
               raise InvalidArgument.new
             end
           end
@@ -33,7 +33,7 @@ module Roadshow
             command = Roadshow::Command.get_command(options.command)
             stdout.puts command.parser(stdout)
           rescue UnknownCommand
-            stdout.puts "Command not found: #{options.command}".colorize(:red)
+            stdout.puts "Error: Command not found: #{options.command}".colorize(:red)
             stdout.puts
             raise CommandFailed.new
           end

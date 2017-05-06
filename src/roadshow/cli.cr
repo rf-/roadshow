@@ -19,7 +19,7 @@ module Roadshow
 
       0
     rescue UnknownCommand
-      stdout.puts "Unknown command: #{command}".colorize(:red)
+      stdout.puts "Error: Unknown command: #{command}".colorize(:red)
       print_usage(stdout)
       1
     rescue CommandFailed
@@ -32,10 +32,10 @@ module Roadshow
 
       Commands:
          help        Get help about a command
-         init        Generate a `scenarios.yml` file
+         init        Generate a `#{SCENARIOS_FILENAME}` file
          generate    Generate Docker configuration
          run         Run scenarios with Docker
-         clean       Clean up Docker images
+         clean       Clean up Docker images and volumes
       HELP
     end
   end

@@ -25,7 +25,7 @@ module Roadshow
       parser.parse(args)
       run(stdin, stdout, options)
     rescue e : OptionParser::InvalidOption | OptionParser::MissingOption
-      stdout.puts e.message.colorize(:red)
+      stdout.puts "Error: #{e.message}".colorize(:red)
       stdout.puts parser(stdout)
       raise CommandFailed.new
     rescue InvalidArgument

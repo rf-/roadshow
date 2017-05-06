@@ -7,7 +7,7 @@ describe Roadshow::Commands::Generate do
         FileUtils.mv("scenarios", "expected_scenarios")
 
         output = SpecHelper.run!(["generate"])
-        output.should eq("Generated files in scenarios/.")
+        output.should eq("Generated files in directory './scenarios'.")
 
         File.exists?("scenarios").should eq(true)
 
@@ -30,7 +30,7 @@ describe Roadshow::Commands::Generate do
         FileUtils.cp("expected_scenarios/two.gemfile", "scenarios")
 
         output = SpecHelper.run!(["generate"])
-        output.should eq("Generated files in scenarios/.")
+        output.should eq("Generated files in directory './scenarios'.")
 
         File.exists?("scenarios").should eq(true)
 

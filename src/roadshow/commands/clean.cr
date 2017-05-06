@@ -45,9 +45,29 @@ module Roadshow
             output: stdout,
             error: stdout
           ).success? || raise CommandFailed.new
-        else
-          puts "Error: no images currently exist for this project.".colorize(:red)
-          raise CommandFailed.new
+        end
+
+        volumes_io = IO::Memory.new
+
+        Process.run(
+          "docker",
+          ["volume", "ls"],
+          input: stdin,
+          output: volumes_io,
+          error: stdout
+        ).success? || raise CommandFailed.new
+
+        volumes = volumes_io.to_s.lines.skip(1).map { |l| l.split[1] }
+        volumes_to_delete = volumes & config.scenarios.flat_map(&.volume_names)
+
+        if volumes_to_delete.any?
+          Process.run(
+            "docker",
+            ["volume", "rm"] + volumes_to_delete,
+            input: stdin,
+            output: stdout,
+            error: stdout
+          ).success? || raise CommandFailed.new
         end
       rescue e : InvalidConfig
         stdout.puts "Error: #{e.message}".colorize(:red)

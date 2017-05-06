@@ -120,6 +120,10 @@ module Roadshow
       "#{@project_name}_scenario_#{@name}"
     end
 
+    def volume_names : Array(String)
+      @volumes.map { |v| "#{@project_name}_#{gsub_name(v)}" }
+    end
+
     private def gsub_name(value : String?) : String?
       if value.nil?
         value

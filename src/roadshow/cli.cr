@@ -35,7 +35,7 @@ module Roadshow
          init        Generate a `scenarios.yml` file
          generate    Generate Docker configuration
          run         Run scenarios with Docker
-         cleanup     Clean up Docker images
+         clean       Clean up Docker images
       HELP
     end
   end

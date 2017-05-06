@@ -1,6 +1,6 @@
 require "../spec_helper"
 
-describe Roadshow::Commands::Cleanup do
+describe Roadshow::Commands::Clean do
   it "cleans up images" do
     SpecHelper.in_project("simple") do
       # First, run the scenarios to create images.
@@ -10,7 +10,7 @@ describe Roadshow::Commands::Cleanup do
       images.should contain("simple_scenario_one")
       images.should contain("simple_scenario_two")
 
-      output = SpecHelper.run!(["cleanup"])
+      output = SpecHelper.run!(["clean"])
       output.should contain("Untagged: simple_scenario_one:latest")
       output.should contain("Untagged: simple_scenario_two:latest")
 

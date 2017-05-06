@@ -1,13 +1,13 @@
 module Roadshow
   module Commands
-    class CleanupOptions
+    class CleanOptions
     end
 
-    class Cleanup < Command(CleanupOptions)
-      def parser(stdout : IO, options = CleanupOptions.new)
+    class Clean < Command(CleanOptions)
+      def parser(stdout : IO, options = CleanOptions.new)
         OptionParser.new do |parser|
           parser.banner = <<-BANNER
-          Usage: roadshow cleanup
+          Usage: roadshow clean
 
           Based on your project's `#{SCENARIOS_FILENAME}`, remove all Docker
           images created to run your project's scenarios.
@@ -15,7 +15,7 @@ module Roadshow
         end
       end
 
-      def run(stdin : IO, stdout : IO, options : CleanupOptions)
+      def run(stdin : IO, stdout : IO, options : CleanOptions)
         unless File.exists?(SCENARIOS_FILENAME)
           stdout.puts "Error: no file './#{SCENARIOS_FILENAME}' found".colorize(:red)
           stdout.puts "\nUse 'roadshow init' to generate one."

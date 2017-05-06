@@ -83,7 +83,7 @@ status then Roadshow will too.
 If you want to clean up after yourself, you can remove all containers, images,
 and volumes created by Roadshow for the current project:
 
-    roadshow cleanup
+    roadshow clean
 
 ## Example: Testing a Ruby library
 

@@ -83,15 +83,16 @@ module Roadshow
       service = @service
       raise "Assertion failure" if service.nil? # Unreachable because of validation
 
-      service_volumes = ["..:/scenario"] + service.volumes
+      service_volumes =
+        ["..:/scenario"] + service.volumes.map { |v| gsub_name(v) }
 
       service_environment = service
         .environment
-        .map { |key, value| {key, gsub_name(value.to_s)} }
+        .map { |key, value| {gsub_name(key), gsub_name(value.to_s)} }
         .to_h
 
       volumes = @volumes
-        .map { |volume_name| {volume_name, {} of String => String} }
+        .map { |volume_name| {gsub_name(volume_name), {} of String => String} }
         .to_h
 
       {

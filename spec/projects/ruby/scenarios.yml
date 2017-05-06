@@ -5,11 +5,11 @@ shared:
   cmd: "bundle install && bundle exec rake"
   service:
     volumes:
-      - bundle:/usr/local/bundle
+      - bundle_{{scenario_name}}:/usr/local/bundle
     environment:
       BUNDLE_GEMFILE: scenarios/{{scenario_name}}.gemfile
   volumes:
-    bundle:
+    bundle_{{scenario_name}}:
 
 scenarios:
   one:

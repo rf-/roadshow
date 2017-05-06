@@ -49,7 +49,6 @@ Here's an example of a basic `scenarios.yml` file:
           environment:
             ENV_VAR: scenario one
       two:
-        from: bash
         cmd: "echo 'overridden command' && echo $ENV_VAR"
         service:
           environment:
@@ -95,20 +94,20 @@ test it across various versions of Ruby and your dependencies. A
     project: my_cool_gem
 
     shared:
-      from: ruby:2.4
       cmd: "bundle install && bundle exec rake"
       service:
         volumes:
-          - bundle:/usr/local/bundle
+          - bundle_{{scenario_name}}:/usr/local/bundle
         environment:
           BUNDLE_GEMFILE: scenarios/{{scenario_name}}.gemfile
       volumes:
-        bundle:
+        bundle_{{scenario_name}}:
 
     scenarios:
       rails32:
         from: ruby:2.2
       rails51:
+        from: ruby:2.4
 
 The `bundle` volume will hold the installed dependencies for each scenario, so
 that you don't have to reinstall them from scratch every time you run anything.

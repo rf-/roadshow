@@ -8,8 +8,8 @@ services:
     image: ruby_scenario_one
     volumes:
     - "..:/scenario"
-    - "bundle:/usr/local/bundle"
+    - "bundle_one:/usr/local/bundle"
     environment:
       BUNDLE_GEMFILE: scenarios/one.gemfile
 volumes:
-  bundle: {}
+  bundle_one: {}

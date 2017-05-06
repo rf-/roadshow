@@ -35,10 +35,19 @@ module Roadshow
       end
 
       def run(stdin : IO, stdout : IO, options : RunOptions)
-        unless File.directory?("scenarios")
-          stdout.puts "Error: no directory './scenarios' found".colorize(:red)
+        unless File.exists?(SCENARIOS_FILENAME)
+          stdout.puts "Error: no file './#{SCENARIOS_FILENAME}' found".colorize(:red)
+          stdout.puts "\nUse 'roadshow init' to generate one."
           raise CommandFailed.new
         end
+
+        unless File.directory?("scenarios")
+          stdout.puts "Error: no directory './scenarios' found".colorize(:red)
+          stdout.puts "\nUse 'roadshow generate' to create scenario files."
+          raise CommandFailed.new
+        end
+
+        config = ProjectConfig.load(YAML.parse(File.read(SCENARIOS_FILENAME)))
 
         compose_files = Dir["scenarios/*.docker-compose.yml"].map do |path|
           {path, File.basename(path, ".docker-compose.yml")}
@@ -68,7 +77,8 @@ module Roadshow
               args,
               input: stdin,
               output: stdout,
-              error: stdout
+              error: stdout,
+              env: { "COMPOSE_PROJECT_NAME" => config.project }
             ).success?
           else
             stdout.puts "\nSkipping scenario: #{name}\n".colorize.bold

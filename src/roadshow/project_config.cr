@@ -4,6 +4,8 @@ module Roadshow
   class ProjectConfig
     extend ConfigUtils
 
+    getter project
+
     @finalized_scenarios : Array(Scenario)?
 
     def self.load(data : YAML::Any)

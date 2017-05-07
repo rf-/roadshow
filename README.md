@@ -129,7 +129,7 @@ Now you can just use `roadshow run` to run your tests across both versions.
 ## Example: Testing code with database dependencies
 
 This is similar to the last example, but uses supporting containers -- a MySQL
-instance in one scenario and a PostgresQL instance in the other.
+instance in one scenario and a PostgreSQL instance in the other.
 
 The `scenarios.yml` is more involved, using the `services` key to specify extra
 containers and the `links` key to connect them to the main service:

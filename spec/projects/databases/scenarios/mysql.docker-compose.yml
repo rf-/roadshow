@@ -1,0 +1,29 @@
+---
+version: "2"
+services:
+  scenario:
+    build:
+      context: ..
+      dockerfile: scenarios/mysql.dockerfile
+    image: databases_scenario_mysql
+    volumes:
+    - "..:/scenario"
+    - "bundle_mysql:/usr/local/bundle"
+    environment:
+      BUNDLE_GEMFILE: scenarios/mysql.gemfile
+      RAILS_ENV: development
+      DATABASE_ADAPTER: mysql2
+      DATABASE_PORT: "3306"
+      DATABASE_USER: root
+    links:
+    - "mysql:database_host"
+  mysql:
+    image: "mysql:8.0"
+    volumes:
+    - "data_mysql:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: database_password
+    links: []
+volumes:
+  bundle_mysql: {}
+  data_mysql: {}

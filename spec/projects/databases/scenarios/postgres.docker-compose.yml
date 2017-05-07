@@ -1,0 +1,29 @@
+---
+version: "2"
+services:
+  scenario:
+    build:
+      context: ..
+      dockerfile: scenarios/postgres.dockerfile
+    image: databases_scenario_postgres
+    volumes:
+    - "..:/scenario"
+    - "bundle_postgres:/usr/local/bundle"
+    environment:
+      BUNDLE_GEMFILE: scenarios/postgres.gemfile
+      RAILS_ENV: development
+      DATABASE_ADAPTER: postgresql
+      DATABASE_PORT: "5432"
+      DATABASE_USER: postgres
+    links:
+    - "postgres:database_host"
+  postgres:
+    image: "postgres:9.6"
+    volumes:
+    - "data_postgres:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_PASSWORD: database_password
+    links: []
+volumes:
+  bundle_postgres: {}
+  data_postgres: {}

@@ -1,0 +1,46 @@
+project: databases
+
+shared:
+  from: ruby:2.4
+  cmd: "(bundle check || bundle install) && bundle exec ruby test.rb"
+  service:
+    volumes:
+      - bundle_{{scenario_name}}:/usr/local/bundle
+    environment:
+      BUNDLE_GEMFILE: scenarios/{{scenario_name}}.gemfile
+      RAILS_ENV: development
+  volumes:
+    bundle_{{scenario_name}}:
+    data_{{scenario_name}}:
+
+scenarios:
+  mysql:
+    service:
+      links:
+        - mysql:database_host
+      environment:
+        DATABASE_ADAPTER: mysql2
+        DATABASE_PORT: 3306
+        DATABASE_USER: root
+    services:
+      mysql:
+        image: mysql:8.0
+        volumes:
+          - "data_mysql:/var/lib/mysql"
+        environment:
+          MYSQL_ROOT_PASSWORD: database_password
+  postgres:
+    service:
+      links:
+        - postgres:database_host
+      environment:
+        DATABASE_ADAPTER: postgresql
+        DATABASE_PORT: 5432
+        DATABASE_USER: postgres
+    services:
+      postgres:
+        image: postgres:9.6
+        volumes:
+          - "data_postgres:/var/lib/postgresql/data"
+        environment:
+          POSTGRES_PASSWORD: database_password

@@ -6,7 +6,7 @@ module Roadshow
   class Scenario
     extend ConfigUtils
 
-    getter project_name, name, from, cmd, service, volumes
+    getter project_name, name, from, cmd, service, other_services, volumes
 
     def self.load(project_name : String,
                   name : String?,
@@ -14,8 +14,24 @@ module Roadshow
       cmd = get_string(data, "cmd")
       from = get_string(data, "from")
 
-      service_hash = get_hash(data, "service")
-      service = Service.load(service_hash) if service_hash
+      service_hash = get_hash(data, "service") || {} of String => YAML::Type
+      image_name = name && "#{project_name}_scenario_#{name}"
+      service = Service.load(image_name, service_hash)
+
+      other_services_hash = get_hash(data, "services")
+      other_services =
+        if other_services_hash
+          other_services_hash.map do |name, _|
+            other_service_hash = get_hash(other_services_hash, name)
+
+            if other_service_hash
+              image_name = get_string(other_service_hash, "image")
+              {name, Service.load(image_name, other_service_hash)}
+            end
+          end.compact.to_h
+        else
+          {} of String => Service
+        end
 
       volumes = get_hash(data, "volumes").try(&.keys) || [] of String
 
@@ -25,6 +41,7 @@ module Roadshow
         from: from,
         cmd: cmd,
         service: service,
+        other_services: other_services,
         volumes: volumes
       )
     end
@@ -34,6 +51,7 @@ module Roadshow
                    @from : String?,
                    @cmd : String?,
                    @service : Service?,
+                   @other_services : Hash(String, Service),
                    @volumes : Array(String))
     end
 
@@ -48,6 +66,9 @@ module Roadshow
         from: other.from || @from,
         cmd: other.cmd || @cmd,
         service: service ? service.merge(other.service) : other.service,
+        other_services: @other_services.merge(other.other_services) do |_, s1, s2|
+          s1.merge(s2)
+        end,
         volumes: @volumes | other.volumes
       )
     end
@@ -83,13 +104,7 @@ module Roadshow
       service = @service
       raise "Assertion failure" if service.nil? # Unreachable because of validation
 
-      service_volumes =
-        ["..:/scenario"] + service.volumes.map { |v| gsub_name(v) }
-
-      service_environment = service
-        .environment
-        .map { |key, value| {gsub_name(key), gsub_name(value.to_s)} }
-        .to_h
+      service_volumes = ["..:/scenario"] + gsub_name(service.volumes)
 
       volumes = @volumes
         .map { |volume_name| {gsub_name(volume_name), {} of String => String} }
@@ -103,11 +118,21 @@ module Roadshow
               "context"    => "..",
               "dockerfile" => "#{OUTPUT_DIRECTORY}/#{dockerfile_name}",
             },
-            "image"       => image_name,
+            "image"       => service.image_name,
             "volumes"     => service_volumes,
-            "environment" => service_environment,
+            "environment" => gsub_name(service.environment),
+            "links"       => gsub_name(service.links),
           },
-        },
+        }.merge(
+          @other_services.map do |name, service|
+            {name, {
+              "image"       => service.image_name,
+              "volumes"     => gsub_name(service.volumes),
+              "environment" => gsub_name(service.environment),
+              "links"       => gsub_name(service.links),
+            }}
+          end.to_h
+        ),
         "volumes" => volumes,
       }.to_yaml
     end
@@ -116,12 +141,28 @@ module Roadshow
       "#{@name}.docker-compose.yml"
     end
 
-    def image_name : String
-      "#{@project_name}_scenario_#{@name}"
+    def image_names : Array(String)
+      ([@service] + @other_services.values)
+        .map { |service| service && service.image_name }
+        .compact
+    end
+
+    def container_names : Array(String)
+      @other_services.keys.map { |name| "#{@project_name}_#{name}_1" }
     end
 
     def volume_names : Array(String)
       @volumes.map { |v| "#{@project_name}_#{gsub_name(v)}" }
+    end
+
+    private def gsub_name(value : Hash(String, V)) : Hash(String, String) forall V
+      value
+        .map { |key, value| {gsub_name(key), gsub_name(value.to_s)} }
+        .to_h
+    end
+
+    private def gsub_name(value : Array(String)) : Array(String)
+      value.map { |s| gsub_name(s) }
     end
 
     private def gsub_name(value : String?) : String?
@@ -135,23 +176,28 @@ module Roadshow
     class Service
       extend ConfigUtils
 
-      def self.load(data : Hash(String, YAML::Type)) : Service
+      def self.load(image_name : String?, data : Hash(String, YAML::Type)) : Service
         environment = (get_hash(data, "environment") || {} of String => String)
           .map { |k, v| {k, v.to_s} }
           .to_h
 
         volumes = (get_array(data, "volumes") || [] of YAML::Type).map(&.to_s)
+        links = (get_array(data, "links") || [] of YAML::Type).map(&.to_s)
 
         new(
+          image_name: image_name,
           environment: environment,
-          volumes: volumes
+          volumes: volumes,
+          links: links
         )
       end
 
-      getter environment, volumes
+      getter image_name, environment, volumes, links
 
-      def initialize(@environment : Hash(String, String),
-                     @volumes : Array(String))
+      def initialize(@image_name : String?,
+                     @environment : Hash(String, String),
+                     @volumes : Array(String),
+                     @links : Array(String))
       end
 
       # Merge the other scenario into this one, overwriting or appending to
@@ -161,8 +207,10 @@ module Roadshow
           self
         else
           Service.new(
+            image_name: @image_name || other.image_name,
             environment: @environment.merge(other.environment),
-            volumes: @volumes + other.volumes
+            volumes: @volumes | other.volumes,
+            links: @links | other.links
           )
         end
       end

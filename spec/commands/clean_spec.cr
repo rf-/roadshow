@@ -52,6 +52,55 @@ describe Roadshow::Commands::Clean do
     end
   end
 
+  it "cleans up containers" do
+    SpecHelper.in_project("databases") do
+      begin
+        SpecHelper.run!(["run"])
+
+        images = `docker images`
+        images.should contain("databases_scenario_mysql")
+        images.should contain("databases_scenario_postgres")
+
+        volumes = `docker volume ls`
+        volumes.should contain("databases_bundle_mysql")
+        volumes.should contain("databases_data_mysql")
+        volumes.should contain("databases_bundle_postgres")
+        volumes.should contain("databases_data_postgres")
+
+        containers = `docker ps`
+        containers.should contain("databases_mysql_1")
+        containers.should contain("databases_postgres_1")
+
+        output = SpecHelper.run!(["clean"])
+        output.should contain("databases_mysql_1")
+        output.should contain("databases_postgres_1")
+        output.should contain("Untagged: databases_scenario_mysql:latest")
+        output.should contain("Untagged: databases_scenario_postgres:latest")
+        output.should contain("databases_bundle_mysql")
+        output.should contain("databases_data_mysql")
+        output.should contain("databases_bundle_postgres")
+        output.should contain("databases_data_postgres")
+
+        images = `docker images`
+        images.should_not contain("databases_scenario_mysql")
+        images.should_not contain("databases_scenario_postgres")
+
+        volumes = `docker volume ls`
+        volumes.should_not contain("databases_bundle_mysql")
+        volumes.should_not contain("databases_data_mysql")
+        volumes.should_not contain("databases_bundle_postgres")
+        volumes.should_not contain("databases_data_postgres")
+
+        containers = `docker ps`
+        containers.should_not contain("databases_mysql_1")
+        containers.should_not contain("databases_postgres_1")
+      ensure
+        FileUtils.rm("scenarios/mysql.gemfile.lock")
+        FileUtils.rm("scenarios/postgres.gemfile.lock")
+      end
+    end
+  end
+
   it "cleans up only images" do
     SpecHelper.in_project("ruby") do
       begin
@@ -114,6 +163,55 @@ describe Roadshow::Commands::Clean do
       ensure
         FileUtils.rm("scenarios/one.gemfile.lock")
         FileUtils.rm("scenarios/two.gemfile.lock")
+      end
+    end
+  end
+
+  it "cleans up only containers" do
+    SpecHelper.in_project("databases") do
+      begin
+        SpecHelper.run!(["run"])
+
+        images = `docker images`
+        images.should contain("databases_scenario_mysql")
+        images.should contain("databases_scenario_postgres")
+
+        volumes = `docker volume ls`
+        volumes.should contain("databases_bundle_mysql")
+        volumes.should contain("databases_data_mysql")
+        volumes.should contain("databases_bundle_postgres")
+        volumes.should contain("databases_data_postgres")
+
+        containers = `docker ps`
+        containers.should contain("databases_mysql_1")
+        containers.should contain("databases_postgres_1")
+
+        output = SpecHelper.run!(["clean", "-c"])
+        output.should contain("databases_mysql_1")
+        output.should contain("databases_postgres_1")
+        output.should_not contain("Untagged: databases_scenario_mysql:latest")
+        output.should_not contain("Untagged: databases_scenario_postgres:latest")
+        output.should_not contain("databases_bundle_mysql")
+        output.should_not contain("databases_data_mysql")
+        output.should_not contain("databases_bundle_postgres")
+        output.should_not contain("databases_data_postgres")
+
+        images = `docker images`
+        images.should contain("databases_scenario_mysql")
+        images.should contain("databases_scenario_postgres")
+
+        volumes = `docker volume ls`
+        volumes.should contain("databases_bundle_mysql")
+        volumes.should contain("databases_data_mysql")
+        volumes.should contain("databases_bundle_postgres")
+        volumes.should contain("databases_data_postgres")
+
+        containers = `docker ps`
+        containers.should_not contain("databases_mysql_1")
+        containers.should_not contain("databases_postgres_1")
+      ensure
+        FileUtils.rm("scenarios/mysql.gemfile.lock")
+        FileUtils.rm("scenarios/postgres.gemfile.lock")
       end
     end
   end

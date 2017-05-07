@@ -10,4 +10,5 @@ services:
     - "..:/scenario"
     environment:
       ENV_VAR: scenario one
+    links: []
 volumes: {}

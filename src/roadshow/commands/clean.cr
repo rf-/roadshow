@@ -1,6 +1,9 @@
 module Roadshow
   module Commands
     class CleanOptions
+      property :containers
+      @containers : Bool = true
+
       property :images
       @images : Bool = true
 
@@ -20,11 +23,18 @@ module Roadshow
 
           parser.separator
 
+          parser.on("-c", "--containers-only", "Only remove containers") do
+            options.images = false
+            options.volumes = false
+          end
+
           parser.on("-i", "--images-only", "Only remove images") do
+            options.containers = false
             options.volumes = false
           end
 
           parser.on("-v", "--volumes-only", "Only remove volumes") do
+            options.containers = false
             options.images = false
           end
         end
@@ -39,6 +49,31 @@ module Roadshow
 
         config = ProjectConfig.load(YAML.parse(File.read(SCENARIOS_FILENAME)))
 
+        if options.containers
+          containers_io = IO::Memory.new
+
+          Process.run(
+            "docker",
+            ["ps", "-a"],
+            input: stdin,
+            output: containers_io,
+            error: stdout
+          ).success? || raise CommandFailed.new
+
+          containers = containers_io.to_s.lines.skip(1).map { |l| l.split[-1].chomp }
+          containers_to_delete = containers & config.scenarios.flat_map(&.container_names)
+
+          if containers_to_delete.any?
+            Process.run(
+              "docker",
+              ["rm", "-f"] + containers_to_delete,
+              input: stdin,
+              output: stdout,
+              error: stdout
+            ).success? || raise CommandFailed.new
+          end
+        end
+
         if options.images
           images_io = IO::Memory.new
 
@@ -51,7 +86,7 @@ module Roadshow
           ).success? || raise CommandFailed.new
 
           images = images_io.to_s.lines.skip(1).map { |l| l.split[0] }
-          images_to_delete = images & config.scenarios.map(&.image_name)
+          images_to_delete = images & config.scenarios.flat_map(&.image_names)
 
           if images_to_delete.any?
             Process.run(

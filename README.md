@@ -126,6 +126,65 @@ containing the gem dependencies for each scenario. For example,
 
 Now you can just use `roadshow run` to run your tests across both versions.
 
+## Example: Testing Ruby code with database dependencies
+
+This is similar to the last example, but uses supporting containers -- a MySQL
+instance in one scenario and a PostgresQL instance in the other.
+
+The `scenarios.yml` is more involved, using the `services` key to specify extra
+containers and the `links` key to connect them to the main service:
+
+```
+project: databases
+
+shared:
+  from: ruby:2.4
+  cmd: "(bundle check || bundle install) && bundle exec ruby test.rb"
+  service:
+    volumes:
+      - bundle_{{scenario_name}}:/usr/local/bundle
+    environment:
+      BUNDLE_GEMFILE: scenarios/{{scenario_name}}.gemfile
+      RAILS_ENV: development
+  volumes:
+    bundle_{{scenario_name}}:
+    data_{{scenario_name}}:
+
+scenarios:
+  mysql:
+    service:
+      links:
+        - mysql:database_host
+      environment:
+        DATABASE_ADAPTER: mysql2
+        DATABASE_PORT: 3306
+        DATABASE_USER: root
+    services:
+      mysql:
+        image: mysql:8.0
+        volumes:
+          - "data_mysql:/var/lib/mysql"
+        environment:
+          MYSQL_ROOT_PASSWORD: database_password
+  postgres:
+    service:
+      links:
+        - postgres:database_host
+      environment:
+        DATABASE_ADAPTER: postgresql
+        DATABASE_PORT: 5432
+        DATABASE_USER: postgres
+    services:
+      postgres:
+        image: postgres:9.6
+        volumes:
+          - "data_postgres:/var/lib/postgresql/data"
+        environment:
+          POSTGRES_PASSWORD: database_password
+```
+
+You can see the rest of the code [here](spec/projects/databases).
+
 ## License and Acknowledgements
 
 Roadshow is available under the terms of the MIT license (see the LICENSE file

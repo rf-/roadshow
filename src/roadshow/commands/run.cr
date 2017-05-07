@@ -48,25 +48,23 @@ module Roadshow
         end
 
         config = ProjectConfig.load(YAML.parse(File.read(SCENARIOS_FILENAME)))
-
-        compose_files = Dir["#{OUTPUT_DIRECTORY}/*.docker-compose.yml"].map do |path|
-          {path, File.basename(path, ".docker-compose.yml")}
-        end
+        scenarios = config.scenarios
 
         if options.scenario
-          compose_files.select! { |(path, name)| name == options.scenario }
+          scenarios.select! { |scenario| scenario.name == options.scenario }
 
-          if compose_files.empty?
+          if scenarios.empty?
             stdout.puts "Error: no scenario '#{options.scenario}' found".colorize(:red)
             raise CommandFailed.new
           end
         end
 
-        success = compose_files.reduce(true) do |success, (path, name)|
+        success = scenarios.reduce(true) do |success, scenario|
           if success
-            stdout.puts "\nRunning scenario: #{name}\n".colorize.bold
+            stdout.puts "\nRunning scenario: #{scenario.name}\n".colorize.bold
 
-            args = ["-f", path, "run", "--rm", "scenario"]
+            compose_file = "#{OUTPUT_DIRECTORY}/#{scenario.name}.docker-compose.yml"
+            args = ["-f", compose_file, "run", "--rm", "scenario"]
 
             if (command = options.command)
               args = args.concat(command)
@@ -81,8 +79,7 @@ module Roadshow
               env: {"COMPOSE_PROJECT_NAME" => config.project}
             ).success?
           else
-            stdout.puts "\nSkipping scenario: #{name}\n".colorize.bold
-
+            stdout.puts "\nSkipping scenario: #{scenario.name}\n".colorize.bold
             false
           end
         end

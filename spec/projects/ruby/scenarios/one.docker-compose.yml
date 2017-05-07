@@ -11,5 +11,6 @@ services:
     - "bundle_one:/usr/local/bundle"
     environment:
       BUNDLE_GEMFILE: scenarios/one.gemfile
+    links: []
 volumes:
   bundle_one: {}

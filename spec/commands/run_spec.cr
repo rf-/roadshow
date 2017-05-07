@@ -1,6 +1,17 @@
 require "../spec_helper"
 
 describe Roadshow::Commands::Run do
+  it "errors if no scenarios directory exists" do
+    SpecHelper.in_project("empty") do
+      SpecHelper.run!(["init"]) # create scenarios.yml
+
+      status, output = SpecHelper.run(["run"])
+
+      status.should eq(2)
+      output.should contain("Error: no directory './scenarios' found")
+    end
+  end
+
   it "runs all scenarios for a simple project" do
     SpecHelper.in_project("simple") do
       output = SpecHelper.run!(["run"])
@@ -75,14 +86,17 @@ describe Roadshow::Commands::Run do
     end
   end
 
-  it "errors if no scenarios directory exists" do
-    SpecHelper.in_project("empty") do
-      SpecHelper.run!(["init"]) # create scenarios.yml
-
-      status, output = SpecHelper.run(["run"])
-
-      status.should eq(2)
-      output.should contain("Error: no directory './scenarios' found")
+  it "runs all scenarios for a project with multiple services" do
+    SpecHelper.in_project("databases") do
+      begin
+        output = SpecHelper.run!(["run"])
+        output.should contain("Successfully used mysql2 database!")
+        output.should contain("Successfully used postgresql database!")
+      ensure
+        FileUtils.rm("scenarios/mysql.gemfile.lock")
+        FileUtils.rm("scenarios/postgres.gemfile.lock")
+        SpecHelper.run!(["clean"]) # Remove containers
+      end
     end
   end
 end

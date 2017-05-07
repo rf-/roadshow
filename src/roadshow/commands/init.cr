@@ -38,8 +38,8 @@ module Roadshow
 
         # The individual scenarios.
         scenarios:
-          one:
-          two:\n
+          one: {}
+          two: {}\n
         YAML
 
         File.write(SCENARIOS_FILENAME, content)

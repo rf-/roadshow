@@ -126,7 +126,7 @@ containing the gem dependencies for each scenario. For example,
 
 Now you can just use `roadshow run` to run your tests across both versions.
 
-## Example: Testing Ruby code with database dependencies
+## Example: Testing code with database dependencies
 
 This is similar to the last example, but uses supporting containers -- a MySQL
 instance in one scenario and a PostgresQL instance in the other.

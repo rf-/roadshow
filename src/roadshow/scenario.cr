@@ -4,36 +4,35 @@ module Roadshow
   # TODO: Split into ScenarioFragment (with nullable fields) and Scenario (with
   # non-nullable fields).
   class Scenario
-    extend ConfigUtils
-
     getter project_name, name, from, cmd, service, other_services, volumes
 
     def self.load(project_name : String,
                   name : String?,
-                  data : Hash(String, YAML::Type)) : Scenario
-      cmd = get_string(data, "cmd")
-      from = get_string(data, "from")
+                  data_hash : Hash(YAML::Type, YAML::Type)) : Scenario
+      data = YAML::Any.new(data_hash)
+      cmd = data["cmd"]?.try(&.as_s?)
+      from = data["from"]?.try(&.as_s?)
 
-      service_hash = get_hash(data, "service") || {} of String => YAML::Type
+      service_hash = data["service"]?.try(&.as_h?) || {} of YAML::Type => YAML::Type
       image_name = name && "#{project_name}_scenario_#{name}"
       service = Service.load(image_name, service_hash)
 
-      other_services_hash = get_hash(data, "services")
+      other_services_hash = data["services"]?.try(&.as_h?)
       other_services =
         if other_services_hash
           other_services_hash.map do |name, _|
-            other_service_hash = get_hash(other_services_hash, name)
+            other_service_hash = YAML::Any.new(other_services_hash[name]?).as_h?
 
             if other_service_hash
-              image_name = get_string(other_service_hash, "image")
-              {name, Service.load(image_name, other_service_hash)}
+              image_name = YAML::Any.new(other_service_hash["image"]?).as_s?
+              {name.to_s, Service.load(image_name, other_service_hash)}
             end
           end.compact.to_h
         else
           {} of String => Service
         end
 
-      volumes = get_hash(data, "volumes").try(&.keys) || [] of String
+      volumes = data["volumes"]?.try(&.as_h?).try(&.keys.map(&.to_s)) || [] of String
 
       new(
         project_name: project_name,
@@ -174,15 +173,15 @@ module Roadshow
     end
 
     class Service
-      extend ConfigUtils
+      def self.load(image_name : String?, data_hash : Hash(YAML::Type, YAML::Type)) : Service
+        data = YAML::Any.new(data_hash)
 
-      def self.load(image_name : String?, data : Hash(String, YAML::Type)) : Service
-        environment = (get_hash(data, "environment") || {} of String => String)
-          .map { |k, v| {k, v.to_s} }
+        environment = (data["environment"]?.try(&.as_h?) || {} of YAML::Type => YAML::Type)
+          .map { |k, v| {k.to_s, v.to_s} }
           .to_h
 
-        volumes = (get_array(data, "volumes") || [] of YAML::Type).map(&.to_s)
-        links = (get_array(data, "links") || [] of YAML::Type).map(&.to_s)
+        volumes = (data["volumes"]?.try(&.as_a?) || [] of YAML::Type).map(&.to_s)
+        links = (data["links"]?.try(&.as_a?) || [] of YAML::Type).map(&.to_s)
 
         new(
           image_name: image_name,

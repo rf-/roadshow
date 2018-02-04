@@ -7,8 +7,8 @@ services:
       dockerfile: scenarios/two.dockerfile
     image: ruby_scenario_two
     volumes:
-    - "..:/scenario"
-    - "bundle_two:/usr/local/bundle"
+    - ..:/scenario
+    - bundle_two:/usr/local/bundle
     environment:
       BUNDLE_GEMFILE: scenarios/two.gemfile
     links: []

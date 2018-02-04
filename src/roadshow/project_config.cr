@@ -2,28 +2,21 @@ module Roadshow
   # A class representing the contents of a `scenarios.yml` file (i.e., the
   # whole state of the project's configuration).
   class ProjectConfig
-    extend ConfigUtils
-
     getter project
 
     @finalized_scenarios : Array(Scenario)?
 
     def self.load(data : YAML::Any)
-      case (raw_data = data.raw)
-      when Hash
-        project = get_string!(raw_data, "project")
+      project = data["project"].as_s
 
-        shared = Scenario.load(project, nil, get_hash!(raw_data, "shared"))
+      shared = Scenario.load(project, nil, data["shared"].as_h)
 
-        scenarios_hash = get_hash!(raw_data, "scenarios")
-        scenarios = scenarios_hash.map do |name, _|
-          Scenario.load(project, name, get_hash!(scenarios_hash, name))
-        end
-
-        new(project: project, shared: shared, scenarios: scenarios)
-      else
-        raise InvalidConfig.new("The config file must be a YAML hash")
+      scenarios_hash = data["scenarios"].as_h
+      scenarios = scenarios_hash.map do |name, _|
+        Scenario.load(project, name.to_s, YAML::Any.new(scenarios_hash[name]).as_h)
       end
+
+      new(project: project, shared: shared, scenarios: scenarios)
     end
 
     def initialize(@project : String,

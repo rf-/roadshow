@@ -7,8 +7,8 @@ services:
       dockerfile: scenarios/postgres.dockerfile
     image: databases_scenario_postgres
     volumes:
-    - "..:/scenario"
-    - "bundle_postgres:/usr/local/bundle"
+    - ..:/scenario
+    - bundle_postgres:/usr/local/bundle
     environment:
       BUNDLE_GEMFILE: scenarios/postgres.gemfile
       RAILS_ENV: development
@@ -16,11 +16,11 @@ services:
       DATABASE_PORT: "5432"
       DATABASE_USER: postgres
     links:
-    - "postgres:database_host"
+    - postgres:database_host
   postgres:
-    image: "postgres:9.6"
+    image: postgres:9.6
     volumes:
-    - "data_postgres:/var/lib/postgresql/data"
+    - data_postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: database_password
     links: []

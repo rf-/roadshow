@@ -7,7 +7,7 @@ services:
       dockerfile: scenarios/two.dockerfile
     image: simple_scenario_two
     volumes:
-    - "..:/scenario"
+    - ..:/scenario
     environment:
       ENV_VAR: scenario two
     links: []

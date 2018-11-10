@@ -8,12 +8,11 @@ module Roadshow
 
     def self.load(project_name : String,
                   name : String?,
-                  data_hash : Hash(YAML::Type, YAML::Type)) : Scenario
-      data = YAML::Any.new(data_hash)
+                  data : Hash(YAML::Any, YAML::Any)) : Scenario
       cmd = data["cmd"]?.try(&.as_s?)
       from = data["from"]?.try(&.as_s?)
 
-      service_hash = data["service"]?.try(&.as_h?) || {} of YAML::Type => YAML::Type
+      service_hash = data["service"]?.try(&.as_h?) || {} of YAML::Any => YAML::Any
       image_name = name && "#{project_name}_scenario_#{name}"
       service = Service.load(image_name, service_hash)
 
@@ -21,10 +20,10 @@ module Roadshow
       other_services =
         if other_services_hash
           other_services_hash.map do |name, _|
-            other_service_hash = YAML::Any.new(other_services_hash[name]?).as_h?
+            other_service_hash = other_services_hash[name]?.try(&.as_h?)
 
             if other_service_hash
-              image_name = YAML::Any.new(other_service_hash["image"]?).as_s?
+              image_name = other_service_hash["image"]?.try(&.as_s?)
               {name.to_s, Service.load(image_name, other_service_hash)}
             end
           end.compact.to_h
@@ -173,15 +172,13 @@ module Roadshow
     end
 
     class Service
-      def self.load(image_name : String?, data_hash : Hash(YAML::Type, YAML::Type)) : Service
-        data = YAML::Any.new(data_hash)
-
-        environment = (data["environment"]?.try(&.as_h?) || {} of YAML::Type => YAML::Type)
+      def self.load(image_name : String?, data : Hash(YAML::Any, YAML::Any)) : Service
+        environment = (data["environment"]?.try(&.as_h?) || {} of YAML::Any => YAML::Any)
           .map { |k, v| {k.to_s, v.to_s} }
           .to_h
 
-        volumes = (data["volumes"]?.try(&.as_a?) || [] of YAML::Type).map(&.to_s)
-        links = (data["links"]?.try(&.as_a?) || [] of YAML::Type).map(&.to_s)
+        volumes = (data["volumes"]?.try(&.as_a?) || [] of YAML::Any).map(&.to_s)
+        links = (data["links"]?.try(&.as_a?) || [] of YAML::Any).map(&.to_s)
 
         new(
           image_name: image_name,

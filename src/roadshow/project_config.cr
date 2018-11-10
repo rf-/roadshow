@@ -13,7 +13,7 @@ module Roadshow
 
       scenarios_hash = data["scenarios"].as_h
       scenarios = scenarios_hash.map do |name, _|
-        Scenario.load(project, name.to_s, YAML::Any.new(scenarios_hash[name]).as_h)
+        Scenario.load(project, name.to_s, scenarios_hash[name].as_h)
       end
 
       new(project: project, shared: shared, scenarios: scenarios)

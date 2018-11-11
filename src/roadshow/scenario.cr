@@ -128,7 +128,9 @@ module Roadshow
               "volumes"     => gsub_name(service.volumes),
               "environment" => gsub_name(service.environment),
               "links"       => gsub_name(service.links),
-            }}
+            }.merge(
+              service.command ? {"command" => gsub_name(service.command)} : {} of String => String
+            )}
           end.to_h
         ),
         "volumes" => volumes,
@@ -177,21 +179,24 @@ module Roadshow
           .map { |k, v| {k.to_s, v.to_s} }
           .to_h
 
+        command = data["command"]?.try(&.as_s?)
         volumes = (data["volumes"]?.try(&.as_a?) || [] of YAML::Any).map(&.to_s)
         links = (data["links"]?.try(&.as_a?) || [] of YAML::Any).map(&.to_s)
 
         new(
           image_name: image_name,
           environment: environment,
+          command: command,
           volumes: volumes,
           links: links
         )
       end
 
-      getter image_name, environment, volumes, links
+      getter image_name, environment, command, volumes, links
 
       def initialize(@image_name : String?,
                      @environment : Hash(String, String),
+                     @command : String?,
                      @volumes : Array(String),
                      @links : Array(String))
       end
@@ -205,6 +210,7 @@ module Roadshow
           Service.new(
             image_name: @image_name || other.image_name,
             environment: @environment.merge(other.environment),
+            command: @command || other.command,
             volumes: @volumes | other.volumes,
             links: @links | other.links
           )

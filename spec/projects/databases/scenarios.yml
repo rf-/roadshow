@@ -25,11 +25,11 @@ scenarios:
     services:
       mysql:
         image: mysql:8.0
-        command: --default-authentication-plugin=mysql_native_password
         volumes:
           - "data_mysql:/var/lib/mysql"
         environment:
           MYSQL_ROOT_PASSWORD: database_password
+        command: --default-authentication-plugin=mysql_native_password
   postgres:
     service:
       links:

@@ -70,7 +70,7 @@ module Roadshow
               args = args.concat(command)
             end
 
-            Process.run(
+            Roadshow::Process.run(
               "docker-compose",
               args,
               input: stdin,

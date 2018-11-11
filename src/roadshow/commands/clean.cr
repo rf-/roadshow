@@ -52,7 +52,7 @@ module Roadshow
         if options.containers
           containers_io = IO::Memory.new
 
-          Process.run(
+          Roadshow::Process.run(
             "docker",
             ["ps", "-a"],
             input: stdin,
@@ -64,7 +64,7 @@ module Roadshow
           containers_to_delete = containers & config.scenarios.flat_map(&.container_names)
 
           if containers_to_delete.any?
-            Process.run(
+            Roadshow::Process.run(
               "docker",
               ["rm", "-f"] + containers_to_delete,
               input: stdin,
@@ -77,7 +77,7 @@ module Roadshow
         if options.images
           images_io = IO::Memory.new
 
-          Process.run(
+          Roadshow::Process.run(
             "docker",
             ["images"],
             input: stdin,
@@ -89,7 +89,7 @@ module Roadshow
           images_to_delete = images & config.scenarios.flat_map(&.image_names)
 
           if images_to_delete.any?
-            Process.run(
+            Roadshow::Process.run(
               "docker",
               ["rmi"] + images_to_delete,
               input: stdin,
@@ -102,7 +102,7 @@ module Roadshow
         if options.volumes
           volumes_io = IO::Memory.new
 
-          Process.run(
+          Roadshow::Process.run(
             "docker",
             ["volume", "ls"],
             input: stdin,
@@ -114,7 +114,7 @@ module Roadshow
           volumes_to_delete = volumes & config.scenarios.flat_map(&.volume_names)
 
           if volumes_to_delete.any?
-            Process.run(
+            Roadshow::Process.run(
               "docker",
               ["volume", "rm"] + volumes_to_delete,
               input: stdin,

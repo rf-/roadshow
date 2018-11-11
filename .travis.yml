@@ -8,3 +8,5 @@ before_script:
   - docker pull postgres:9.6
   - docker pull ruby:2.2
   - docker pull ruby:2.4
+env:
+  - VERBOSE=1

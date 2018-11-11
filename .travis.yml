@@ -2,3 +2,9 @@ language: crystal
 sudo: required
 services:
   - docker
+before_script:
+  # Pull needed images so the actual build doesn't have to wait for them
+  - docker pull mysql:8.0
+  - docker pull postgres:9.6
+  - docker pull ruby:2.2
+  - docker pull ruby:2.4

@@ -10,9 +10,9 @@ ActiveRecord::Base.establish_connection(
 
 ActiveRecord::Migration.verbose = false
 
-begin
-  retries = 0
+retries = 0
 
+begin
   if ENV['DATABASE_ADAPTER'] == "mysql2"
     ActiveRecord::Base.connection.execute 'CREATE DATABASE IF NOT EXISTS test;'
     ActiveRecord::Base.connection.execute 'USE test;'
@@ -23,6 +23,7 @@ rescue => e
   if retries < 3
     puts e.message
     sleep 2 ** retries
+    retries += 1
     retry
   else
     raise

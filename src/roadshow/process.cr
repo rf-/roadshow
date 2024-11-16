@@ -10,7 +10,7 @@ module Roadshow
         @other_io.read(slice)
       end
 
-      def write(slice : Bytes)
+      def write(slice : Bytes) : Nil
         STDOUT.write(slice)
         @other_io.write(slice)
       end

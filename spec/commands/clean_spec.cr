@@ -68,12 +68,12 @@ describe Roadshow::Commands::Clean do
         volumes.should contain("databases_data_postgres")
 
         containers = `docker ps`
-        containers.should contain("databases_mysql_1")
-        containers.should contain("databases_postgres_1")
+        containers.should contain("databases-mysql-1")
+        containers.should contain("databases-postgres-1")
 
         output = SpecHelper.run!(["clean"])
-        output.should contain("databases_mysql_1")
-        output.should contain("databases_postgres_1")
+        output.should contain("databases-mysql-1")
+        output.should contain("databases-postgres-1")
         output.should contain("Untagged: databases_scenario_mysql:latest")
         output.should contain("Untagged: databases_scenario_postgres:latest")
         output.should contain("databases_bundle_mysql")
@@ -92,8 +92,8 @@ describe Roadshow::Commands::Clean do
         volumes.should_not contain("databases_data_postgres")
 
         containers = `docker ps`
-        containers.should_not contain("databases_mysql_1")
-        containers.should_not contain("databases_postgres_1")
+        containers.should_not contain("databases-mysql-1")
+        containers.should_not contain("databases-postgres-1")
       ensure
         FileUtils.rm("scenarios/mysql.gemfile.lock")
         FileUtils.rm("scenarios/postgres.gemfile.lock")
@@ -183,12 +183,12 @@ describe Roadshow::Commands::Clean do
         volumes.should contain("databases_data_postgres")
 
         containers = `docker ps`
-        containers.should contain("databases_mysql_1")
-        containers.should contain("databases_postgres_1")
+        containers.should contain("databases-mysql-1")
+        containers.should contain("databases-postgres-1")
 
         output = SpecHelper.run!(["clean", "-c"])
-        output.should contain("databases_mysql_1")
-        output.should contain("databases_postgres_1")
+        output.should contain("databases-mysql-1")
+        output.should contain("databases-postgres-1")
         output.should_not contain("Untagged: databases_scenario_mysql:latest")
         output.should_not contain("Untagged: databases_scenario_postgres:latest")
         output.should_not contain("databases_bundle_mysql")
@@ -207,8 +207,8 @@ describe Roadshow::Commands::Clean do
         volumes.should contain("databases_data_postgres")
 
         containers = `docker ps`
-        containers.should_not contain("databases_mysql_1")
-        containers.should_not contain("databases_postgres_1")
+        containers.should_not contain("databases-mysql-1")
+        containers.should_not contain("databases-postgres-1")
       ensure
         FileUtils.rm("scenarios/mysql.gemfile.lock")
         FileUtils.rm("scenarios/postgres.gemfile.lock")

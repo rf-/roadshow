@@ -87,7 +87,7 @@ describe Roadshow::Commands::Generate do
 
         status.should eq(2)
         output.should contain(
-          "Error: Unable to create directory './scenarios': File exists"
+          "Error: Unable to create directory: 'scenarios': File exists"
         )
       ensure
         FileUtils.rm_rf("scenarios")

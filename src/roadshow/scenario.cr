@@ -109,7 +109,6 @@ module Roadshow
         .to_h
 
       {
-        "version"  => "2",
         "services" => {
           "scenario" => {
             "build" => {
